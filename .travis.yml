@@ -14,20 +14,14 @@ env:
 
 before_script:
   - echo "$ALI_PASSWORD" | docker login "$ALIYUN_REGISTRY" -u "$ALI_USERNAME" --password-stdin
- 
-script:
   - bash get_kolla_images_list.sh
   - images=$(cat images.txt)
   - echo -e "All images is:\n$images"
   - count=$(echo "$images" |wc -l)
   - echo "Images count is $count"
-  - icount=1
-  - |
-    for image in $images
-    do
-      echo [$icount/$count]: $image
-      docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      docker push $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      ((icount++))
-    done
+
+jobs:
+  include:
+    - stage: test
+      script: ./pull1.sh
+    - script: ./pull2.sh
