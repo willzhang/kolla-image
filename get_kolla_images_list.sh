@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 git clone https://github.com/openstack/kolla.git
 
 first_index=`$(ls -l kolla/docker | grep "^d" | awk '{print $NF}')`
