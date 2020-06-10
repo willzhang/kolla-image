@@ -19,9 +19,17 @@ before_script:
   - echo -e "All images is:\n$images"
   - count=$(echo "$images" |wc -l)
   - echo "Images count is $count"
-
+  - sed -n '1,50p' images.txt > images1.txt
+  - sed -n '51,100p' images.txt > images2.txt  
+  - sed -n '101,150p' images.txt > images3.txt
+  - sed -n '151,200p' images.txt > images4.txt  
+  - sed -n '201,275p' images.txt > images5.txt 
+  
 jobs:
   include:
     - stage: test
-      script: sh pull1.sh
-    - script: sh pull2.sh
+      script: sh pull.sh images1.txt
+    - script: sh pull.sh images2.txt
+    - script: sh pull.sh images3.txt
+    - script: sh pull.sh images4.txt
+    - script: sh pull.sh images5.txt
