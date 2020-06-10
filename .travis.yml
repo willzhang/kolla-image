@@ -10,7 +10,7 @@ env:
     - KOLLA_BASE_DISTRO="centos"
     - INSTALL_TYPE="source"
     - TAG="ussuri"
-    - DES_REGISTRY="registry.cn-shenzhen.aliyuncs.com"
+    - ALI_REGISTRY="registry.cn-shenzhen.aliyuncs.com"
     - ALIYUN_NAMESPACE="kollaimage"
 
 before_script:
@@ -27,9 +27,9 @@ script:
     do
       echo [$icount/$count]: $image
       docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $DES_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      docker push $DES_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+      docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+      docker push $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
     #  docker rmi $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-    #  docker rmi $DES_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+    #  docker rmi $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
       ((icount++))
     done
