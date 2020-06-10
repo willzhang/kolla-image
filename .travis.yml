@@ -16,7 +16,7 @@ before_script:
   - echo "$ALI_PASSWORD" | docker login "$ALIYUN_REGISTRY" -u "$ALI_USERNAME" --password-stdin
  
 script:
-  - sh get_kolla_images_list.sh
+  - bash get_kolla_images_list.sh
   - images=$(cat images.txt)
   - echo -e "All images is:\n$images"
   - count=$(echo "$images" |wc -l)
