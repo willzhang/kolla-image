@@ -19,7 +19,7 @@ before_script:
 script:
   - git clone https://github.com/openstack/kolla.git
   - ls -l ./kolla/docker | grep "^d" | awk '{print $NF}' > images
-  - echo $images
+  - cat $IMAGEFILE
   - count=`cat $IMAGEFILE |wc -l`
   - icount=1
   - |
