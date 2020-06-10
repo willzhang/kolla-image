@@ -17,9 +17,9 @@ before_script:
   - echo "$ALI_PASSWORD" | docker login "$ALI_REGISTRY" -u "$ALI_USERNAME" --password-stdin
  
 script:
-  - echo "start pull and retag and push"
   - git clone https://github.com/openstack/kolla.git
   - ls -l ./kolla/docker | grep "^d" | awk '{print $NF}' > images
+  - echo $images
   - count=`cat $IMAGEFILE |wc -l`
   - icount=1
   - |
