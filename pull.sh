@@ -1,6 +1,7 @@
 #!/bin/bash
 icount=1
-images=$(sed -n '1,50p' images.txt)
+images=$(cat $1)
+count=$(echo "images" |wc -l)
 for image in $images
 do
   echo [$icount/$count]: $image
