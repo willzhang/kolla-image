@@ -14,6 +14,7 @@ env:
 
 before_script:
   - echo "$ALI_PASSWORD" | docker login "$ALIYUN_REGISTRY" -u "$ALI_USERNAME" --password-stdin
+  # fix travis-CI maximum time limit for jobs
   - while sleep 5m; do echo "=====[ $SECONDS seconds, still building... ]====="; done &
  
 script:
