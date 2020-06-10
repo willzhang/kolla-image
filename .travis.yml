@@ -5,22 +5,21 @@ services:
 
 env:
   global:
-    - IMAGEFILE=images
     - DOCKER_NAMESPACE="kolla"
     - KOLLA_BASE_DISTRO="centos"
     - INSTALL_TYPE="source"
     - TAG="ussuri"
-    - ALI_REGISTRY="registry.cn-shenzhen.aliyuncs.com"
+    - ALIYUN_REGISTRY="registry.cn-shenzhen.aliyuncs.com"
     - ALIYUN_NAMESPACE="kollaimage"
 
 before_script:
-  - echo "$ALI_PASSWORD" | docker login "$ALI_REGISTRY" -u "$ALI_USERNAME" --password-stdin
+  - echo "$ALI_PASSWORD" | docker login "$ALIYUN_REGISTRY" -u "$ALI_USERNAME" --password-stdin
  
 script:
-  - git clone https://github.com/openstack/kolla.git
-  - images=$(ls -l ./kolla/docker | grep "^d" | awk '{print $NF}')
+  - sh get_kolla_images_list.sh
+  - images=$(cat images.txt)
   - echo -e "All images is:\n$images"
-  - count=$(echo $images |wc -l)
+  - count=$(echo "$images" |wc -l)
   - echo "Images count is $count"
   - icount=1
   - |
@@ -28,7 +27,7 @@ script:
     do
       echo [$icount/$count]: $image
       docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-      docker push $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+      docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+      docker push $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
       ((icount++))
     done
