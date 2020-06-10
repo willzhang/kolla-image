@@ -19,7 +19,7 @@ before_script:
 script:
   - echo "start pull and retag and push"
   - git clone https://github.com/openstack/kolla.git
-  - ll ./kolla/docker | grep "^d" | awk '{print $NF}' > images
+  - ls -l ./kolla/docker | grep "^d" | awk '{print $NF}' > images
   - count=`cat $IMAGEFILE |wc -l`
   - icount=1
   - |
@@ -29,7 +29,5 @@ script:
       docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
       docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
       docker push $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-    #  docker rmi $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
-    #  docker rmi $ALI_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
       ((icount++))
     done
