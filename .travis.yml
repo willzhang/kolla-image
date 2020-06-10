@@ -19,8 +19,8 @@ before_script:
 script:
   - git clone https://github.com/openstack/kolla.git
   - images=$(ls -l ./kolla/docker | grep "^d" | awk '{print $NF}')
-  - echo "All images is: $images"
-  - count=`cat $IMAGEFILE |wc -l`
+  - echo -e "All images is:\n$images"
+  - count=$(echo $images |wc -l)
   - echo "Images count is $count"
   - icount=1
   - |
