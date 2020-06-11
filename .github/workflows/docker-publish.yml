@@ -33,7 +33,7 @@ jobs:
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
-        run: echo "${{ secrets.ALI_PASSWORD }}" | docker login docker.pkg.github.com -u ${{ ALI_USERNAME }} --password-stdin
+        run: echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login ${{ ALIYUN_REGISTRY }} -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
 
       - name: Push image
         run: |
