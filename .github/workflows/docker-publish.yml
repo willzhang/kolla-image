@@ -1,0 +1,53 @@
+name: Docker
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+env:
+  IMAGE_NAME: image
+  DOCKER_NAMESPACE="kolla"
+  KOLLA_BASE_DISTRO="centos"
+  INSTALL_TYPE="source"
+  TAG="ussuri"
+  ALIYUN_REGISTRY="registry.cn-shenzhen.aliyuncs.com"
+  ALIYUN_NAMESPACE="kollaimage"
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Log into registry
+        run: echo "${{ secrets.ALI_PASSWORD }}" | docker login docker.pkg.github.com -u ${{ ALI_USERNAME }} --password-stdin
+
+      - name: Push image
+        run: |
+          bash get_kolla_images_list.sh
+          images=$(cat images.txt)
+          echo -e "All images is:\n$images"
+          count=$(echo "$images" |wc -l)
+          echo "Images count is $count"
+          icount=1
+          for image in $images
+          do
+            echo [$icount/$count]: $image
+            docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+            docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+            docker push $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG
+            ((icount++))
+          done		  
