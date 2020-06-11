@@ -15,12 +15,12 @@ on:
 
 env:
   IMAGE_NAME: image
-  DOCKER_NAMESPACE="kolla"
-  KOLLA_BASE_DISTRO="centos"
-  INSTALL_TYPE="source"
-  TAG="ussuri"
-  ALIYUN_REGISTRY="registry.cn-shenzhen.aliyuncs.com"
-  ALIYUN_NAMESPACE="kollaimage"
+  DOCKER_NAMESPACE: kolla
+  KOLLA_BASE_DISTRO: centos
+  INSTALL_TYPE: source
+  TAG: ussuri
+  ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
+  ALIYUN_NAMESPACE: kollaimage
 
 jobs:
   push:
