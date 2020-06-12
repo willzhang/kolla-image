@@ -1,5 +1,3 @@
 ## get kolla images
 
-pull dockerhub kolla images to aliyun registry by travisCI
-
-rerun
+Pull dockerhub kolla images to aliyun registry by github Actions
