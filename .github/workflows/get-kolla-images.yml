@@ -57,7 +57,7 @@ jobs:
             done
           fi
         done
-        echo "Images count is $(cat $images.txt | wc -l)"
+        echo "Images count is $(cat images.txt | wc -l)"
         echo -e "All images is:\n$(cat images.txt)"
 
     # pull and push images
