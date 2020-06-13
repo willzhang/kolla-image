@@ -1,50 +1,77 @@
-name: Docker
+# This workflow will pull kolla ansible docker images from dockerhub, push it to aliyun container registry.
+#
+# To configure this workflow:
+#
+# 1. Set up secrets in your workspace: 
+#    - ALIYUN_USERNAME with aliyun registry username
+#    - ALIYUN_PASSWORD with aliyun registry password
+#
+# 2. Change the values for the ALIYUN_REGISTRY, ALIYUN_NAMESPACE  environment variables (below).
 
+name: CI
 on:
   push:
-    # Publish `master` as Docker `latest` image.
-    branches:
-      - master
-
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
-
-  # Run tests for any PRs.
+    branches: [ master ]
   pull_request:
+    branches: [ master ]
 
 env:
-  IMAGE_NAME: image
   DOCKER_NAMESPACE: kolla
   KOLLA_BASE_DISTRO: centos
   INSTALL_TYPE: binary
-  TAG: stein
+  OPENSTACK_RELEASE: stein
   ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
   ALIYUN_NAMESPACE: kollaimage
 
 jobs:
-  push:
+  get-kolla-images:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-      - name: Log into registry
-        run: echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login $ALIYUN_REGISTRY -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
+    # Log into aliyun registry
+    - name: Log into aliyun registry
+      run: echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login $ALIYUN_REGISTRY -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
+      
+    # clone kolla repo
+    - name: clone kolla repo
+      run: git clone https://github.com/openstack/kolla.git -b stable/$OPENSTACK_RELEASE
 
-      - name: Push image
-        run: |
-          bash get_kolla_images_list.sh
-          images=$(cat images.txt)
-          echo -e "All images is:\n$images"
-          count=$(echo "$images" |wc -l)
-          echo "Images count is $count"
-          icount=1
-          for image in $images
+    # get images list
+    - name: get images list
+      run: |
+        first_index=($(ls -l kolla/docker | grep "^d" | awk '{print $NF}'))	  
+        for first_file in ${first_index[@]}
           do
-            echo [$icount/$count]: $image
-            docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG || true
-            docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG || true
-            docker push $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$TAG || true
-            ((icount++))
-          done		  
+          #check if subdirectory exits
+          second_files=($(ls -l kolla/docker/$first_file | grep "^d" | awk '{print $NF}'))
+          if [ ${#second_files[@]} -eq 0 ]
+          then
+            echo $first_file >> images.txt
+          else
+            for second_file in ${second_files[@]}
+            do
+              echo $second_file >> images.txt
+            done
+          fi
+        done
+
+    # pull and push images
+    - name: pull and push images
+      run: |
+        bash get_kolla_images_list.sh
+        images=$(cat images.txt)
+        echo -e "All images is:\n$images"
+        count=$(echo "$images" |wc -l)
+        echo "Images count is $count"
+        icount=1
+        for image in $images
+        do
+          echo [$icount/$count]: $image
+          docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE || true
+          docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE || true
+          docker push $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE || true
+          ((icount++))
+        done
