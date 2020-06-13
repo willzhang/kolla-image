@@ -17,8 +17,8 @@ env:
   IMAGE_NAME: image
   DOCKER_NAMESPACE: kolla
   KOLLA_BASE_DISTRO: centos
-  INSTALL_TYPE: source
-  TAG: ussuri
+  INSTALL_TYPE: binary
+  TAG: stein
   ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
   ALIYUN_NAMESPACE: kollaimage
 
