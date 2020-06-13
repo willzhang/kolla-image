@@ -57,18 +57,14 @@ jobs:
             done
           fi
         done
-
-    # list all images
-    - name: list all images
-      run: |
-        images=$(cat images.txt)
-        echo -e "All images is:\n$images"
-        count=$(echo "$images" |wc -l)
-        echo "Images count is $count"
+        echo "Images count is $(echo "$images" |wc -l)"
+        echo -e "All images is:\n$(cat images.txt)"
 
     # pull and push images
     - name: pull and push images
       run: |
+        images=$(cat images.txt)
+        count=$(echo "$images" |wc -l)
         icount=1
         for image in $images
         do
