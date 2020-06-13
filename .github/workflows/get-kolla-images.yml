@@ -58,14 +58,17 @@ jobs:
           fi
         done
 
-    # pull and push images
-    - name: pull and push images
+    # list all images
+    - name: list all images
       run: |
-        bash get_kolla_images_list.sh
         images=$(cat images.txt)
         echo -e "All images is:\n$images"
         count=$(echo "$images" |wc -l)
         echo "Images count is $count"
+
+    # pull and push images
+    - name: pull and push images
+      run: |
         icount=1
         for image in $images
         do
