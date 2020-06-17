@@ -19,7 +19,7 @@ env:
   DOCKER_NAMESPACE: kolla
   KOLLA_BASE_DISTRO: centos
   INSTALL_TYPE: source
-  OPENSTACK_RELEASE: rocky
+  OPENSTACK_RELEASE: queens
   ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
   ALIYUN_NAMESPACE: kollaimage
 
