@@ -20,8 +20,8 @@ env:
   KOLLA_BASE_DISTRO: centos
   INSTALL_TYPE: binary
   OPENSTACK_RELEASE: train
-  ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
-  ALIYUN_NAMESPACE: kollaimage
+  ALIYUN_REGISTRY: registry.cn-beijing.aliyuncs.com
+  ALIYUN_NAMESPACE: kollatftnet
 
 jobs:
   get-kolla-images:
