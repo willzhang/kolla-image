@@ -1,0 +1,75 @@
+# This workflow will pull kolla ansible docker images from dockerhub, push it to aliyun container registry.
+#
+# To configure this workflow:
+#
+# 1. Set up secrets in your workspace: 
+#    - ALIYUN_USERNAME with aliyun registry username
+#    - ALIYUN_PASSWORD with aliyun registry password
+#
+# 2. Change the values for the ALIYUN_REGISTRY, ALIYUN_NAMESPACE  environment variables (below).
+
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  DOCKER_NAMESPACE: kolla
+  KOLLA_BASE_DISTRO: centos
+  INSTALL_TYPE: binary
+  OPENSTACK_RELEASE: train
+  ALIYUN_REGISTRY: registry.cn-beijing.aliyuncs.com
+  ALIYUN_NAMESPACE: kollatftnet
+
+jobs:
+  get-kolla-images:
+    runs-on: centos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Log into aliyun registry
+    - name: Log into aliyun registry
+      run: echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login $ALIYUN_REGISTRY -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
+      
+    # clone kolla repo
+    - name: clone kolla repo
+      run: git clone https://github.com/openstack/kolla.git -b stable/$OPENSTACK_RELEASE
+
+    # get images list
+    - name: get images list
+      run: |
+        first_index=($(ls -l kolla/docker | grep "^d" | awk '{print $NF}'))	  
+        for first_file in ${first_index[@]}
+          do
+          #check if subdirectory exits
+          second_files=($(ls -l kolla/docker/$first_file | grep "^d" | awk '{print $NF}'))
+          if [ ${#second_files[@]} -eq 0 ]
+          then
+            echo $first_file >> images.txt
+          else
+            for second_file in ${second_files[@]}
+            do
+              echo $second_file >> images.txt
+            done
+          fi
+        done
+        echo "Images count is $(cat images.txt | wc -l)"
+        echo -e "All images is:\n$(cat images.txt)"
+    # pull and push images
+    - name: pull and push images
+      run: |
+        images=$(cat images.txt)
+        count=$(echo "$images" |wc -l)
+        icount=1
+        for image in $images
+        do
+          echo [$icount/$count]: $image
+          docker pull $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE || true
+          docker tag $DOCKER_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE || true
+          docker push $ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/${KOLLA_BASE_DISTRO}-${INSTALL_TYPE}-$image:$OPENSTACK_RELEASE || true
+          ((icount++))
+        done
