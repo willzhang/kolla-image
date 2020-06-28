@@ -25,7 +25,7 @@ env:
 
 jobs:
   get-kolla-images:
-    runs-on: centos
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
