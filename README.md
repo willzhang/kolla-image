@@ -2,4 +2,3 @@
 
 Pull dockerhub kolla images to aliyun registry by github Actions
 
-ceshi
