@@ -19,9 +19,9 @@ env:
   DOCKER_NAMESPACE: kolla
   KOLLA_BASE_DISTRO: centos
   INSTALL_TYPE: source
-  OPENSTACK_RELEASE: train
+  OPENSTACK_RELEASE: stein
   ALIYUN_REGISTRY: registry.cn-beijing.aliyuncs.com
-  ALIYUN_NAMESPACE: sourcekolla
+  ALIYUN_NAMESPACE: sourcestein
 
 jobs:
   get-kolla-images:
