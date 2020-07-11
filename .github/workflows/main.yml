@@ -1,0 +1,43 @@
+# This workflow will pull kolla ansible docker images from dockerhub, push it to aliyun container registry.
+#
+# To configure this workflow:
+#
+# 1. Set up secrets in your workspace: 
+#    - ALIYUN_USERNAME with aliyun registry username
+#    - ALIYUN_PASSWORD with aliyun registry password
+#
+# 2. Change the values for the ALIYUN_REGISTRY, ALIYUN_NAMESPACE  environment variables (below).
+
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  DOCKER_NAMESPACE: kolla
+  KOLLA_BASE_DISTRO: centos
+  INSTALL_TYPE: source
+  OPENSTACK_RELEASE: train
+  ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
+  ALIYUN_NAMESPACE: kollaimage
+
+jobs:
+  get-kolla-images:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Log into aliyun registry
+    - name: Log into aliyun registry
+      run: echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login $ALIYUN_REGISTRY -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
+      
+    # get images list
+    - name: get images list
+      run: |
+        wget https://github.com/AliyunContainerService/image-syncer/releases/download/v1.2.0/image-syncer-v1.2.0-linux-amd64.tar.gz
+        tar -zxvf image-syncer-v1.2.0-linux-amd64.tar.gz
+        bash image-syncer --proc=50 --config=./config.json --registry=registry.cn-shenzhen.aliyuncs.com --namespace=kollaimage --retries=2 --log=./log
