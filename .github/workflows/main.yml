@@ -38,6 +38,8 @@ jobs:
     # get images list
     - name: get images list
       run: |
+        sed -i "s#USER#${{ secrets.ALIYUN_USERNAME }}#g" config.json
+        sed -i "s#PASS#${{ secrets.ALIYUN_PASSWORD }}#g" config.json
         wget https://github.com/AliyunContainerService/image-syncer/releases/download/v1.2.0/image-syncer-v1.2.0-linux-amd64.tar.gz
         tar -zxvf image-syncer-v1.2.0-linux-amd64.tar.gz
         bash image-syncer --proc=50 --config=./config.json --registry=registry.cn-shenzhen.aliyuncs.com --namespace=kollaimage --retries=2 --log=./log
