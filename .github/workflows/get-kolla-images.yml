@@ -17,11 +17,11 @@ on:
 
 env:
   DOCKER_NAMESPACE: kolla
-  KOLLA_BASE_DISTRO: centos
+  KOLLA_BASE_DISTRO: ubuntu
   INSTALL_TYPE: source
-  OPENSTACK_RELEASE: train
+  OPENSTACK_RELEASE: ussuri
   ALIYUN_REGISTRY: registry.cn-shenzhen.aliyuncs.com
-  ALIYUN_NAMESPACE: kollaimage
+  ALIYUN_NAMESPACE: farland-kolla
 
 jobs:
   get-kolla-images:
